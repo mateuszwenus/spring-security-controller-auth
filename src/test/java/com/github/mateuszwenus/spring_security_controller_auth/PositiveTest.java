@@ -66,4 +66,15 @@ public class PositiveTest extends TestSupport {
     // then
     assertThat(result, is(true));
   }
+
+  @Test
+  public void shouldSucceedWhenIpAddressMatch() throws Exception {
+    // given
+    SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
+    // when
+    boolean result = interceptor.preHandle(mockHttpRequest("127.0.0.1"), mockHttpResponse(),
+        createHandlerMethod("hasIpAddress('127.0.0.1')"));
+    // then
+    assertThat(result, is(true));
+  }
 }

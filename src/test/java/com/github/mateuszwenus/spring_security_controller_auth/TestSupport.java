@@ -23,6 +23,12 @@ public abstract class TestSupport extends AbstractJUnit4SpringContextTests {
     return new MockHttpServletRequest();
   }
 
+  protected HttpServletRequest mockHttpRequest(String ipAddress) {
+    MockHttpServletRequest req = new MockHttpServletRequest();
+    req.setRemoteAddr(ipAddress);
+    return req;
+  }
+
   protected HttpServletResponse mockHttpResponse() {
     return new MockHttpServletResponse();
   }

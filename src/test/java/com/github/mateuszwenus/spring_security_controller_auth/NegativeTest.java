@@ -78,4 +78,17 @@ public class NegativeTest extends TestSupport {
       // then
     }
   }
+
+  @Test
+  public void shouldThrowExceptionWhenIpAddressDoesNotMatch() throws Exception {
+    // given
+    SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
+    try {
+      // when
+      interceptor.preHandle(mockHttpRequest("127.0.0.2"), mockHttpResponse(), createHandlerMethod("hasIpAddress('127.0.0.1')"));
+      Assert.fail();
+    } catch (AccessDeniedException expected) {
+      // then
+    }
+  }
 }
