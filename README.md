@@ -1,6 +1,7 @@
 Spring-security-controller-auth is a library, which allows you to apply authorization rules to controller methods using annotations without moving `<global-method-security>` or `@EnableGlobalMethodSecurity` to web application context. It provides a solution, which is something between web security and global method security. It operates on HTTP request level (just like web security), but it is configured by annotations (like global method security).
 
 ## Installation
+The library is not in any maven repository, so you have to install it manually to your local repo:
 ```bash
 git clone https://github.com/mateuszwenus/spring-security-controller-auth.git
 cd spring-security-controller-auth
