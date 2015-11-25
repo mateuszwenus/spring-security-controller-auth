@@ -3,6 +3,8 @@ package com.github.mateuszwenus.spring_security_controller_auth;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,11 +14,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = SpringConfig.class)
 public class NegativeTest extends TestSupport {
 
-  private HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create();
-
+	@Autowired
+	private ApplicationContext ctx;
+	
   @Test
   public void shouldThrowExceptionForHasRole() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -30,6 +34,7 @@ public class NegativeTest extends TestSupport {
   @Test
   public void shouldThrowExceptionForHasAnyRole() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -43,6 +48,7 @@ public class NegativeTest extends TestSupport {
   @Test
   public void shouldAllowDirectAccessToPrincipal() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -56,6 +62,7 @@ public class NegativeTest extends TestSupport {
   @Test
   public void shouldAllowDirectAccessToAuthentication() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -69,6 +76,7 @@ public class NegativeTest extends TestSupport {
   @Test
   public void shouldThrowExceptionForDenyAll() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -82,6 +90,7 @@ public class NegativeTest extends TestSupport {
   @Test
   public void shouldThrowExceptionWhenIpAddressDoesNotMatch() throws Exception {
     // given
+  	HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
     SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
     try {
       // when
@@ -91,4 +100,18 @@ public class NegativeTest extends TestSupport {
       // then
     }
   }
+  
+	@Test
+	public void shouldThrowExceptionWhenServiceReturnsFalse() throws Exception {
+		// given
+		HandlerSecurityInterceptor interceptor = HandlerSecurityInterceptor.create(ctx);
+		SecurityContextHolder.getContext().setAuthentication(createAuthentication("user", "ROLE_USER"));
+		try {
+			// when
+			interceptor.preHandle(mockHttpRequest(), mockHttpResponse(), createHandlerMethod("@fooService.returnFalse()"));
+			Assert.fail();
+		} catch (AccessDeniedException expected) {
+			// then
+		}
+	}
 }

@@ -5,12 +5,14 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
 import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -61,12 +63,20 @@ public class HandlerSecurityInterceptor extends AbstractSecurityInterceptor impl
   }
 
   @SuppressWarnings("rawtypes")
-  public static HandlerSecurityInterceptor create() {
+  public static HandlerSecurityInterceptor create(ApplicationContext ctx) {
     HandlerSecurityInterceptor interceptor = new HandlerSecurityInterceptor();
-    WebExpressionVoterAdapter voter = new WebExpressionVoterAdapter(new WebExpressionVoter());
+    WebExpressionVoterAdapter voter = new WebExpressionVoterAdapter(createWebExpressionVoter(ctx));
     AccessDecisionManager accessDecisionManager = new AffirmativeBased(Arrays.<AccessDecisionVoter> asList(voter));
     interceptor.setAccessDecisionManager(accessDecisionManager);
     interceptor.setSecurityMetadataSource(new ExpressionBasedHandlerInvocationSecurityMetadataSource());
     return interceptor;
   }
+
+	private static WebExpressionVoter createWebExpressionVoter(ApplicationContext ctx) {
+		DefaultWebSecurityExpressionHandler handler = new DefaultWebSecurityExpressionHandler();
+		handler.setApplicationContext(ctx);
+		WebExpressionVoter voter = new WebExpressionVoter();
+		voter.setExpressionHandler(handler);
+		return voter;
+	}
 }
